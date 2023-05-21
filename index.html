@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vigenère Cipher</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Vigenère Cipher</h1>
+        <form>
+            <div class="mb-3">
+                <label for="text" class="form-label">Enter Text:</label>
+                <input type="text" class="form-control text-center" id="text">
+            </div>
+            <div class="mb-3">
+                <label for="key" class="form-label">Enter Key:</label>
+                <input type="text" class="form-control text-center" id="key">
+            </div>
+            <button type="button" class="btn btn-primary" onclick="encrypt()">Encrypt</button>
+            <button type="button" class="btn btn-danger" onclick="decrypt()">Decrypt</button>
+
+        </form>
+    </div>
+
+    <!-- Message Box Modal -->
+    <div class="modal fade" id="message-box-modal" tabindex="-1" role="dialog" aria-labelledby="message-box-title"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="message-box-title">Cipher Text</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="cipher-text"></p>
+                    <p id="key-info"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function encrypt() {
+            var plaintext = document.getElementById("text").value.toUpperCase();
+            var key = document.getElementById("key").value.toUpperCase();
+
+            if (plaintext.length === 0 || key.length === 0) {
+                alert("Please enter both plaintext and key.");
+                return;
+            }
+
+            var ciphertext = "";
+            var repeatedKey = "";
+            var keyIndex = 0;
+
+            for (var i = 0; i < plaintext.length; i++) {
+                var currentChar = plaintext.charAt(i);
+
+                if (currentChar !== " ") {
+                    var plainCharCode = currentChar.charCodeAt(0);
+
+                    // Get the corresponding character from the key
+                    var keyChar = key.charAt(keyIndex % key.length);
+                    var keyCharCode = keyChar.charCodeAt(0);
+
+                    var cipherCharCode = (plainCharCode + keyCharCode) % 26; // Modulo 26 for uppercase letters
+                    var encryptedChar = String.fromCharCode(cipherCharCode + 65); // Convert to uppercase ASCII value
+                    repeatedKey += keyChar !== " " ? keyChar : ""; // Skip adding spaces to repeatedKey
+
+                    if (encryptedChar !== " ") {
+                        ciphertext += encryptedChar;
+                    } else {
+                        ciphertext += " "; // Add a space to ciphertext for each space in the plaintext
+                    }
+
+                    keyIndex++;
+                } else {
+                    ciphertext += " "; // Preserve spaces in the plaintext
+                }
+            }
+
+            document.getElementById("cipher-text").textContent = ciphertext;
+            document.getElementById("key-info").textContent = "Key: " + repeatedKey;
+
+            var messageBoxModal = new bootstrap.Modal(
+                document.getElementById("message-box-modal")
+            );
+            messageBoxModal.show();
+        }
+
+
+        function decrypt() {
+            var ciphertext = document.getElementById("text").value.toUpperCase();
+            var key = document.getElementById("key").value.toUpperCase();
+
+            if (ciphertext.length === 0 || key.length === 0) {
+                alert("Please enter both ciphertext and key.");
+                return;
+            }
+
+            var plaintext = "";
+            var repeatedKey = "";
+            var keyIndex = 0;
+
+            for (var i = 0; i < ciphertext.length; i++) {
+                var currentChar = ciphertext.charAt(i);
+
+                if (currentChar !== " ") {
+                    var cipherCharCode = currentChar.charCodeAt(0);
+
+                    // Get the corresponding character from the key
+                    var keyChar = key.charAt(keyIndex % key.length);
+                    var keyCharCode = keyChar.charCodeAt(0);
+
+                    var plainCharCode = (cipherCharCode - keyCharCode + 26) % 26; // Modulo 26 for uppercase letters
+                    var decryptedChar = String.fromCharCode(plainCharCode + 65); // Convert to uppercase ASCII value
+                    repeatedKey += keyChar !== " " ? keyChar : ""; // Skip adding spaces to repeatedKey
+
+                    if (decryptedChar !== " ") {
+                        plaintext += decryptedChar;
+                    } else {
+                        plaintext += " "; // Add a space to plaintext for each space in the ciphertext
+                    }
+
+                    keyIndex++;
+                } else {
+                    plaintext += " "; // Preserve spaces in the ciphertext
+                }
+            }
+
+            document.getElementById("cipher-text").textContent = plaintext;
+            document.getElementById("key-info").textContent = "Key: " + repeatedKey;
+
+            var messageBoxModal = new bootstrap.Modal(
+                document.getElementById("message-box-modal")
+            );
+            messageBoxModal.show();
+        }
+
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js"
+        integrity="sha384-Y4oOpwW3duJdCWv5ly8SCFYWqFDsfob/3GkgExXKV4idmbt98QcxXYs9UoXAB7BZ"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
